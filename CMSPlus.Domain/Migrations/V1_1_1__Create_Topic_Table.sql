@@ -1,4 +1,4 @@
-USE [CMSPlus]
+USE [eugen-database]
 GO
 /****** Object:  Table [dbo].[AspNetRoleClaims]    Script Date: 1/23/2023 5:03:26 PM ******/
 SET ANSI_NULLS ON
