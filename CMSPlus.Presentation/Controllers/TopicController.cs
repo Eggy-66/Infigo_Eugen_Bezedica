@@ -12,13 +12,16 @@ public class TopicController : Controller
 {
     private readonly ITopicService _topicService;
     private readonly IMapper _mapper;
+
+    private readonly ICommentService _commentService; // Service to handle comments
     private readonly IValidator<TopicEditModel> _editModelValidator;
     private readonly IValidator<TopicCreateModel> _createModelValidator;
 
-    public TopicController(ITopicService topicService,IMapper mapper, IValidator<TopicEditModel> editModelValidator, IValidator<TopicCreateModel> createModelValidator)
+    public TopicController(ITopicService topicService,IMapper mapper, ICommentService commentService, IValidator<TopicEditModel> editModelValidator, IValidator<TopicCreateModel> createModelValidator)
     {
         _topicService = topicService;
         _mapper = mapper;
+        _commentService = commentService;
         _editModelValidator = editModelValidator;
         _createModelValidator = createModelValidator;
     }
@@ -98,14 +101,34 @@ public class TopicController : Controller
         return RedirectToAction("Index");
     }
 
-    public async Task<IActionResult> Details(string systemName)
+[HttpGet]
+public async Task<IActionResult> Details(string systemName)
+{
+    var topic = await _topicService.GetBySystemName(systemName);
+    if (topic == null)
     {
-        var topic = await _topicService.GetBySystemName(systemName);
-        if (topic == null)
-        {
-            throw new ArgumentException($"Item with system name: {systemName} wasn't found!");
-        }
-        var topicDto = _mapper.Map<TopicEntity, TopicDetailsModel>(topic);
-        return View(topicDto);
+        throw new ArgumentException($"Item with system name: {systemName} wasn't found!");
     }
+
+    var topicDto = _mapper.Map<TopicEntity, TopicDetailsModel>(topic);
+    var comments = await _commentService.GetByTopicId(topic.Id);
+    topicDto.Comments = comments.Select(c => _mapper.Map<CommentEntity, CommentViewModel>(c)).ToList();
+    topicDto.NewComment.TopicId = topic.Id;
+
+    return View(topicDto);
+}
+
+[HttpPost]
+public async Task<IActionResult> AddComment(CommentCreateModel comment)
+{
+    if (!ModelState.IsValid)
+    {
+        return RedirectToAction("Details", new { id = comment.TopicId });
+    }
+
+    var commentEntity = _mapper.Map<CommentCreateModel, CommentEntity>(comment);
+    await _commentService.AddComment(commentEntity);
+
+    return RedirectToAction("Details", new { id = comment.TopicId });
+}
 }
