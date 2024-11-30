@@ -14,4 +14,38 @@
     <div class="row">
         <p class="col-12 text-black-50 text-end">System name: @Model.SystemName</p>
     </div>
+    <h1>@Model.Title</h1>
+<p>@Model.Body</p>
+
+<h2>Comments</h2>
+@if (Model.Comments.Any())
+{
+    foreach (var comment in Model.Comments)
+    {
+        <div>
+            <strong>@comment.Name</strong>
+            <p>@comment.Content</p>
+            <small>@comment.CreatedOnUtc</small>
+        </div>
+        <hr />
+    }
+}
+else
+{
+    <p>No comments yet.</p>
+}
+
+<h3>Add a Comment</h3>
+<form asp-action="AddComment" method="post">
+    <input type="hidden" asp-for="NewComment.TopicId" />
+    <div>
+        <label asp-for="NewComment.Name"></label>
+        <input asp-for="NewComment.Name" />
+    </div>
+    <div>
+        <label asp-for="NewComment.Content"></label>
+        <textarea asp-for="NewComment.Content"></textarea>
+    </div>
+    <button type="submit">Submit</button>
+</form>
 </div>
