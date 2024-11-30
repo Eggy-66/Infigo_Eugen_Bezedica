@@ -13,4 +13,7 @@ public class TopicDetailsModel:BaseTopicModel
     public string Body { get; set; }
     public DateTime? CreatedOnUtc { get; set; }
     public DateTime? UpdatedOnUtc { get; set; }
+
+    public List<CommentViewModel> Comments { get; set; } = new(); 
+    public CommentCreateModel NewComment { get; set; } = new(); 
 }
