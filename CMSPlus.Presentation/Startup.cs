@@ -1,6 +1,7 @@
 using CMSPlus.Domain;
 using CMSPlus.Presentation.AutoMapperProfiles;
 using CMSPlus.Services;
+using CMSPlus.Services.Interfaces;
 
 namespace CMSPlus.Presentation;
 
@@ -24,6 +25,9 @@ public class Startup
         services.AddAutoMapper();
         
         services.AddServices();
+
+        // Register the CommentService
+        services.AddScoped<ICommentService, CommentService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
